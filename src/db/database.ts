@@ -60,5 +60,11 @@ export const getAllTours = async (): Promise<Tour[]> => {
     );
     return rows;
 }
+export const getTourById = async (id: number): Promise<Tour[]> => {
+    const [rows] = await pool.query<Tour[]>(
+        "SELECT * FROM tour WHERE id = ?", [id]
+    );
+    return rows;
+}
 
 export default pool;

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getAllTours } from "../db/database";
+import { getAllTours, getTourById } from "../db/database";
 
 const router = Router();
 
@@ -13,5 +13,18 @@ router.get("/", async (_req: Request, res: Response): Promise<void> => {
 
     }
 });
+router.get("/:id", async (req: Request, res: Response): Promise<void> => {
+    try {
+        const tour = await getTourById(Number(req.params.id));
+        if (tour.length === 0) {
+            res.status(404).json({ error: "Tour not found" });
+            return;
+        }
+        res.json(tour[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+})
 
 export default router;
