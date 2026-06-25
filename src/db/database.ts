@@ -19,6 +19,20 @@ export interface User extends RowDataPacket {
     password_hash: string;
     role: string;
 }
+export interface Tour extends RowDataPacket {
+    id: number;
+    title: string;
+    description: string;
+    departure_date: string;
+    return_date: string;
+    price_per_person: number;
+    max_seats: number;
+    available_seats: number;
+    category: string;
+    image: string;
+    destination_id: number;
+    guide_id: number;
+}
 
 export const getUserByEmail = async (email: string): Promise<User[]> => {
     const [rows] = await pool.query<User[]>(
@@ -40,5 +54,11 @@ export const createUser = async (
     );
     return result;
 };
+export const getAllTours = async (): Promise<Tour[]> => {
+    const [rows] = await pool.query<Tour[]>(
+        "SELECT * FROM tour",
+    );
+    return rows;
+}
 
 export default pool;

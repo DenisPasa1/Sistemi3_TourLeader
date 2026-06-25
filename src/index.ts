@@ -4,6 +4,7 @@ import cors from "cors";
 import pool from "./db/database";
 import session from "express-session";
 import authRouter from "./routes/auth.routes";
+import toursRouter from "./routes/tours.routes";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -32,6 +33,7 @@ app.get("/health", async (_req: Request, res: Response) => {
     }
 });
 app.use("/auth", authRouter);
+app.use("/tours", toursRouter);
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
