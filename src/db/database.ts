@@ -33,6 +33,13 @@ export interface Tour extends RowDataPacket {
     destination_id: number;
     guide_id: number;
 }
+export interface Reservation extends RowDataPacket {
+    id: number;
+    reserved_at: string;
+    status: string;
+    user_id: number;
+    tour_id: number;
+}
 
 export const getUserByEmail = async (email: string): Promise<User[]> => {
     const [rows] = await pool.query<User[]>(
@@ -63,6 +70,22 @@ export const getAllTours = async (): Promise<Tour[]> => {
 export const getTourById = async (id: number): Promise<Tour[]> => {
     const [rows] = await pool.query<Tour[]>(
         "SELECT * FROM tour WHERE id = ?", [id]
+    );
+    return rows;
+}
+export const createReservation = async (
+    status: string,
+    user_id: number,
+    tour_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO reservation (reserved_at, status, user_id, tour_id) VALUES (NOW(),?,?,?)", [status, user_id, tour_id]
+    );
+    return result;
+}
+export const getReservationsByUserId = async (userId: number): Promise<Reservation[]> => {
+    const [rows] = await pool.query<Reservation[]>(
+        "SELECT * FROM reservation WHERE user_id = ?", [userId]
     );
     return rows;
 }

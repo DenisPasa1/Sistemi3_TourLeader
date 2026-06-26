@@ -5,6 +5,7 @@ import pool from "./db/database";
 import session from "express-session";
 import authRouter from "./routes/auth.routes";
 import toursRouter from "./routes/tours.routes";
+import reservationsRouter from "./routes/reservation.routes";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -38,6 +39,7 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
 });
+app.use("/reservations", reservationsRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
