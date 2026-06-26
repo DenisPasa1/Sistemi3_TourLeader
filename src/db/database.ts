@@ -95,6 +95,13 @@ export interface Passenger extends RowDataPacket {
     passport_expiry: string;
     reservation_id: number;
 }
+export interface Waitlist extends RowDataPacket {
+    id: number;
+    joined_at: string;
+    notified: boolean;
+    user_id: number;
+    tour_id: number;
+}
 
 
 export const getUserByEmail = async (email: string): Promise<User[]> => {
@@ -225,6 +232,28 @@ export const getAllPassengers = async (): Promise<Passenger[]> => {
 export const getPassengerByReservationId = async (tourId: number): Promise<Passenger[]> => {
     const [rows] = await pool.query<Passenger[]>(
         "SELECT * FROM passenger WHERE reservation_id = ?", [tourId]
+    );
+    return rows;
+}
+export const joinWaitlist = async (
+    user_id: number,
+    tour_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO waitlist (joined_at, notified, user_id, tour_id) VALUES (NOW(), false, ?, ?)",
+        [user_id, tour_id]
+    );
+    return result;
+}
+export const getWaitlistByTourId = async (tourId: number): Promise<Waitlist[]> => {
+    const [rows] = await pool.query<Waitlist[]>(
+        "SELECT * FROM waitlist WHERE tour_id = ?", [tourId]
+    );
+    return rows;
+}
+export const getWaitlistByUserId = async (userId: number): Promise<Waitlist[]> => {
+    const [rows] = await pool.query<Waitlist[]>(
+        "SELECT * FROM waitlist WHERE user_id = ?", [userId]
     );
     return rows;
 }

@@ -11,6 +11,7 @@ import destinationRouter from "./routes/destination.routes";
 import flightRouter from "./routes/flight.routes";
 import guideRouter from "./routes/guide.routes";
 import passengerRouter from "./routes/passenger.routes";
+import waitlistRouter from "./routes/waitlist.routes";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -46,6 +47,7 @@ app.use("/destinations", destinationRouter);
 app.use("/flights", flightRouter);
 app.use("/guides", guideRouter);
 app.use("/passengers", passengerRouter);
+app.use("/waitlist", waitlistRouter);
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
