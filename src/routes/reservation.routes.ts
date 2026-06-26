@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { createReservation, getReservationsByUserId, createPassenger, getPassengerByReservationId } from '../db/database';
+import { requireLogin } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/:userId', async (req: Request, res: Response): Promise<void> => {
+router.get('/:userId', requireLogin, async (req: Request, res: Response): Promise<void> => {
     const userId = parseInt(req.params.userId as string, 10);
     try {
         const reservations = await getReservationsByUserId(userId);
@@ -14,7 +15,7 @@ router.get('/:userId', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireLogin, async (req: Request, res: Response): Promise<void> => {
     const { tour_id, passengers } = req.body;
     const user_id = (req.session as any).user?.id;
 
@@ -41,7 +42,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-router.get("/:id/passengers", async (req: Request, res: Response): Promise<void> => {
+router.get("/:id/passengers", requireLogin, async (req: Request, res: Response): Promise<void> => {
     try {
         const passengers = await getPassengerByReservationId(Number(req.params.id));
         res.json(passengers);

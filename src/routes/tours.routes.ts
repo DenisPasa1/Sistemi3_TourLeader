@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
-import { getAllTours, getTourById, getGuideByTourId, getHotelByTourId } from "../db/database";
+import { getAllTours, getTourById, getGuideByTourId, getHotelByTourId, pool } from "../db/database";
+import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
@@ -46,4 +47,13 @@ router.get("/:id/hotel", async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: "Napaka strežnika" });
     }
 });
-export default router;
+router.delete("/:id", requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const id = Number(req.params.id);
+        await pool.query("DELETE FROM tour WHERE id = ?", [id]);
+        res.json({ message: "Tura izbrisana" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+}); export default router;

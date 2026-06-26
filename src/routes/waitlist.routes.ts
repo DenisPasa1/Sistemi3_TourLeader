@@ -1,9 +1,10 @@
 import { Router, Response, Request } from "express";
 import { joinWaitlist, getWaitlistByTourId, getWaitlistByUserId } from "../db/database";
+import { requireLogin, requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireLogin, async (req: Request, res: Response): Promise<void> => {
     const { tour_id, user_id } = req.body;
 
     if (!user_id || !tour_id) {
@@ -19,7 +20,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-router.get("/tour/:tourId", async (req: Request, res: Response): Promise<void> => {
+router.get("/tour/:tourId", requireAdmin, async (req: Request, res: Response): Promise<void> => {
     const tourId = parseInt(req.params.tourId as string, 10);
     try {
         const waitlist = await getWaitlistByTourId(tourId);
@@ -29,7 +30,7 @@ router.get("/tour/:tourId", async (req: Request, res: Response): Promise<void> =
         res.status(500).json({ error: "Napaka s strežnikom" });
     }
 });
-router.get("/user/:userId", async (req: Request, res: Response): Promise<void> => {
+router.get("/my", requireLogin, async (req: Request, res: Response): Promise<void> => {
     const userId = parseInt(req.params.userId as string, 10);
     try {
         const waitlist = await getWaitlistByUserId(userId);
