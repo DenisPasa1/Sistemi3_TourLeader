@@ -11,6 +11,7 @@ export default function Menu() {
                 <>
                     <span>Hello, {user.first_name}</span>
                     <button onClick={handleLogout}>Logout</button>
+                    <Link to="/my-reservations">My Reservations</Link>
                 </>
             )}
             {!user && (

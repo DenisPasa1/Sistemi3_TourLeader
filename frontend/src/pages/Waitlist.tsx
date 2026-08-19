@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 const API_URL = "http://localhost:3001";
 
@@ -20,10 +20,6 @@ export default function SingleTour() {
         loadTour();
     }, [id]);
 
-    if (!tour) return <p>Nalaganje...</p>;
-
-    console.log("Available seats:", tour.available_seats);
-
     const handleJoinWaitlist = async () => {
         const user = JSON.parse(localStorage.getItem("user") || "null");
         if (!user) { alert("Najprej se prijavite."); return; }
@@ -36,17 +32,18 @@ export default function SingleTour() {
         alert(data.message || data.error);
     };
 
+    if (!tour) return <p>Nalaganje...</p>;
+
     return (
         <main>
             <h1>{tour.title}</h1>
             <p>{tour.description}</p>
-            <p>Cena: {tour.price_per_person} €</p>
+            <p>Cena: {tour.price_per_person}€</p>
+            <p>Odhod: {tour.departure_date}</p>
+            <p>Vrnitev: {tour.return_date}</p>
             <p>Prosta mesta: {tour.available_seats}</p>
-            {tour.available_seats === 0 ? (
-                <button onClick={handleJoinWaitlist}>Pridruži se čakalni listi</button>
-            ) : (
-                <Link to={`/tours/${id}/reserve`}>Rezerviraj</Link>
-            )}
+            <Link to={`/tours/${id}/reserve`}>Rezerviraj</Link>
+            <button onClick={handleJoinWaitlist}>Pridruži se čakalni listi</button>
         </main>
     );
 }
