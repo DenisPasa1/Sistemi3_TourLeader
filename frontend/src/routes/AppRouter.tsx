@@ -4,6 +4,7 @@ import Register from "../pages/Register";
 import Menu from "../components/Menu";
 import Tours from "../pages/Tours";
 import SingleTour from "../pages/SingleTour";
+import Reservation from "../pages/Reservation";
 
 export default function AppRouter() {
     return (
@@ -14,6 +15,7 @@ export default function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/tours/:id" element={<SingleTour />} />
+                <Route path="/reservation/:id/reserve" element={<Reservation />} />
             </Routes>
         </BrowserRouter>
     );

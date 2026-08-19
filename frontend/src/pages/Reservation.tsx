@@ -1,0 +1,53 @@
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+const API_URL = "http://localhost:3001";
+
+export default function Reservation() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    const [message, setMessage] = useState("");
+    const [passengers, setPassengers] = useState([
+        { first_name: "", last_name: "", date_of_birth: "", passport_number: "", passport_expiry: "" }
+    ]);
+
+    const handlePassengerChange = (index: number, field: string, value: string) => {
+        const updated = [...passengers];
+        updated[index] = { ...updated[index], [field]: value };
+        setPassengers(updated);
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!user) { setMessage("Najprej se prijavite."); return; }
+        try {
+            const res = await fetch(`${API_URL}/reservations`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tour_id: id, user_id: user.id, passengers }),
+            });
+            const data = await res.json();
+            if (res.ok) { setMessage("Rezervacija uspešna!"); navigate("/"); }
+            else setMessage(data.error || "Napaka.");
+        } catch { setMessage("Napaka strežnika."); }
+    };
+
+    return (
+        <main>
+            <h1>Rezervacija</h1>
+            <form onSubmit={handleSubmit}>
+                {passengers.map((p, i) => (
+                    <div key={i}>
+                        <input placeholder="Ime" value={p.first_name} onChange={(e) => handlePassengerChange(i, "first_name", e.target.value)} />
+                        <input placeholder="Priimek" value={p.last_name} onChange={(e) => handlePassengerChange(i, "last_name", e.target.value)} />
+                        <input type="date" value={p.date_of_birth} onChange={(e) => handlePassengerChange(i, "date_of_birth", e.target.value)} />
+                        <input placeholder="Številka potnega lista" value={p.passport_number} onChange={(e) => handlePassengerChange(i, "passport_number", e.target.value)} />
+                        <input type="date" value={p.passport_expiry} onChange={(e) => handlePassengerChange(i, "passport_expiry", e.target.value)} />                    </div>
+                ))}
+                <button type="submit">Rezerviraj</button>
+            </form>
+            {message && <p>{message}</p>}
+        </main>
+    );
+}

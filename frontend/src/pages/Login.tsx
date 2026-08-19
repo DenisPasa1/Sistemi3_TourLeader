@@ -22,6 +22,7 @@ export default function Login() {
 
             if (res.ok) {
                 setMessage("Prijava uspešna!");
+                localStorage.setItem("user", JSON.stringify(data.user));
             } else {
                 setMessage(data.error || "Napaka pri prijavi.");
             }

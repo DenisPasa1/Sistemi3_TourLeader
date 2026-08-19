@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const API_URL = "http://localhost:3001";
 
@@ -27,6 +27,7 @@ export default function SingleTour() {
             <h1>{tour.title}</h1>
             <p>{tour.description}</p>
             <p>Cena: {tour.price_per_person} €</p>
+            <Link to={`/reservation/${tour.id}/reserve`}>Rezerviraj</Link>
         </main>
     );
 }
