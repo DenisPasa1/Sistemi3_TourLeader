@@ -33,6 +33,23 @@ export interface Tour extends RowDataPacket {
     destination_id: number;
     guide_id: number;
 }
+export const createTour = async (
+    title: string,
+    description: string,
+    departure_date: string,
+    return_date: string,
+    price_per_person: number,
+    max_seats: number,
+    category: string,
+    destination_id: number,
+    guide_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO tour (title, description, departure_date, return_date, price_per_person, max_seats, available_seats, category, destination_id, guide_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [title, description, departure_date, return_date, price_per_person, max_seats, max_seats, category, destination_id, guide_id]
+    );
+    return result;
+}
 export interface Reservation extends RowDataPacket {
     id: number;
     reserved_at: string;
@@ -274,5 +291,48 @@ export const getWaitlistByUserId = async (userId: number): Promise<Waitlist[]> =
         "SELECT * FROM waitlist WHERE user_id = ?", [userId]
     );
     return rows;
+}
+export const createBus = async (
+    license_plate: string,
+    total_seats: number,
+    tour_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO bus (license_plate, total_seats, tour_id) VALUES (?, ?, ?)",
+        [license_plate, total_seats, tour_id]
+    );
+    return result;
+}
+
+export const createFlight = async (
+    flight_number: string,
+    airline: string,
+    departure_airport: string,
+    arrival_airport: string,
+    departure_time: string,
+    arrival_time: string,
+    direction: string,
+    tour_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO flight (flight_number, airline, departure_airport, arrival_airport, departure_time, arrival_time, direction, tour_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [flight_number, airline, departure_airport, arrival_airport, departure_time, arrival_time, direction, tour_id]
+    );
+    return result;
+}
+
+export const createHotel = async (
+    name: string,
+    address: string,
+    stars: number,
+    check_in: string,
+    check_out: string,
+    tour_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO hotel (name, address, stars, check_in, check_out, tour_id) VALUES (?, ?, ?, ?, ?, ?)",
+        [name, address, stars, check_in, check_out, tour_id]
+    );
+    return result;
 }
 export default pool;
