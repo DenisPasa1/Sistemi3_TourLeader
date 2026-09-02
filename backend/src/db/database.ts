@@ -52,6 +52,24 @@ export interface BusSeat extends RowDataPacket {
     bus_id: number;
     reservation_id: number;
 }
+export const assignSeatsToReservation = async (
+    reservationId: number,
+    seatNumbers: number[],
+    busId: number
+): Promise<void> => {
+    for (const seatNum of seatNumbers) {
+        await pool.query(
+            "INSERT INTO bus_seat (seat_number, bus_id, reservation_id) VALUES (?, ?, ?)",
+            [String(seatNum), busId, reservationId]
+        );
+    }
+}
+export const updateAvailableSeats = async (tourId: number, change: number): Promise<void> => {
+    await pool.query(
+        "UPDATE tour SET available_seats = available_seats + ? WHERE id = ?",
+        [change, tourId]
+    );
+}
 export interface Destination extends RowDataPacket {
     id: number;
     country: string;

@@ -17,7 +17,7 @@ export default function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/tours/:id" element={<SingleTour />} />
-                <Route path="/reservation/:id/reserve" element={<Reservation />} />
+                <Route path="/tours/:id/reserve" element={<Reservation />} />
                 <Route path="/my-reservations" element={<MyReservations />} />
                 <Route path="/waitlist" element={<Waitlist />} />
             </Routes>

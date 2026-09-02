@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { createReservation, getReservationsByUserId, createPassenger, getPassengerByReservationId } from '../db/database';
+import { createReservation, getReservationsByUserId, createPassenger, getPassengerByReservationId, assignSeatsToReservation } from '../db/database';
+import { updateAvailableSeats } from '../db/database';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.get('/:userId', async (req: Request, res: Response): Promise<void> => {
 });
 
 router.post("/", async (req: Request, res: Response): Promise<void> => {
-    const { tour_id, passengers, user_id } = req.body;
+    const { tour_id, passengers, user_id, seat_numbers, bus_id } = req.body;
 
     if (!user_id) {
         res.status(401).json({ error: "Niste prijavljeni" });
@@ -32,6 +33,12 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
         for (const p of passengers) {
             await createPassenger(p.first_name, p.last_name, p.date_of_birth, p.passport_number, p.passport_expiry, reservationId);
         }
+
+        if (seat_numbers && bus_id) {
+            await assignSeatsToReservation(reservationId, seat_numbers, bus_id);
+        }
+
+        await updateAvailableSeats(tour_id, -passengers.length);
 
         res.status(201).json({ message: "Rezervacija ustvarjena!", reservation_id: reservationId });
     } catch (err) {

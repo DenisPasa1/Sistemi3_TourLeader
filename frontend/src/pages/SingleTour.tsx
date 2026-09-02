@@ -6,6 +6,15 @@ const API_URL = "http://localhost:3001";
 export default function SingleTour() {
     const { id } = useParams();
     const [tour, setTour] = useState<any>(null);
+    const [bus, setBus] = useState<any>(null);
+    const [seats, setSeats] = useState<any[]>([]);
+    const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+
+    const toggleSeat = (seatNum: number) => {
+        setSelectedSeats(prev =>
+            prev.includes(seatNum) ? prev.filter(s => s !== seatNum) : [...prev, seatNum]
+        );
+    };
 
     useEffect(() => {
         async function loadTour() {
@@ -13,6 +22,14 @@ export default function SingleTour() {
                 const res = await fetch(`${API_URL}/tours/${id}`);
                 const data = await res.json();
                 setTour(data);
+                const busRes = await fetch(`${API_URL}/bus/${id}`);
+                const busData = await busRes.json();
+                if (busData[0]) {
+                    setBus(busData[0]);
+                    const seatsRes = await fetch(`${API_URL}/bus/${busData[0].id}/seats`);
+                    const seatsData = await seatsRes.json();
+                    setSeats(seatsData);
+                }
             } catch (err) {
                 console.error("Napaka pri nalaganju ture:", err);
             }
@@ -21,8 +38,6 @@ export default function SingleTour() {
     }, [id]);
 
     if (!tour) return <p>Nalaganje...</p>;
-
-    console.log("Available seats:", tour.available_seats);
 
     const handleJoinWaitlist = async () => {
         const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -45,7 +60,42 @@ export default function SingleTour() {
             {tour.available_seats === 0 ? (
                 <button onClick={handleJoinWaitlist}>Pridruži se čakalni listi</button>
             ) : (
-                <Link to={`/tours/${id}/reserve`}>Rezerviraj</Link>
+                <button onClick={() => {
+                    localStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
+                    localStorage.setItem("busId", String(bus.id));
+                    window.location.href = `/tours/${id}/reserve`;
+                }}>Rezerviraj</button>
+            )}
+            {bus && (
+                <div>
+                    <h3>Sedežni red</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px", width: "fit-content" }}>
+                        {Array.from({ length: bus.total_seats }, (_, i) => {
+                            const seatNum = i + 1;
+                            const occupied = seats.some(s => s.seat_number === seatNum);
+                            return (
+                                <button key={seatNum}
+                                    disabled={occupied}
+                                    onClick={() => toggleSeat(seatNum)}
+                                    style={{
+                                        background: occupied ? "red" : selectedSeats.includes(seatNum) ? "blue" : "green",
+                                        color: "white",
+                                        width: "40px",
+                                        height: "40px",
+                                        fontSize: "12px",
+                                        cursor: occupied ? "not-allowed" : "pointer",
+                                        border: "none",
+                                        borderRadius: "4px"
+                                    }}>
+                                    {seatNum}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {selectedSeats.length > 0 && (
+                        <p>Izbrani sedeži: {selectedSeats.join(", ")}</p>
+                    )}
+                </div>
             )}
         </main>
     );
