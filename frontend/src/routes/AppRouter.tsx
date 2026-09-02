@@ -7,6 +7,7 @@ import SingleTour from "../pages/SingleTour";
 import Reservation from "../pages/Reservation";
 import MyReservations from "../pages/MyReservations";
 import Waitlist from "../pages/Waitlist";
+import AdminPanel from "../pages/AdminPanel";
 
 export default function AppRouter() {
     return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
                 <Route path="/tours/:id/reserve" element={<Reservation />} />
                 <Route path="/my-reservations" element={<MyReservations />} />
                 <Route path="/waitlist" element={<Waitlist />} />
+                <Route path="/admin" element={<AdminPanel />} />
             </Routes>
         </BrowserRouter>
     );

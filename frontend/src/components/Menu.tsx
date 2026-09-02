@@ -20,6 +20,7 @@ export default function Menu() {
                     <Link to="/register">Register</Link>
                 </>
             )}
+            {user && user.role === "admin" && <Link to="/admin">Admin Panel</Link>}
         </nav>
     );
 }

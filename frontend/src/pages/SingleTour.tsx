@@ -9,6 +9,8 @@ export default function SingleTour() {
     const [bus, setBus] = useState<any>(null);
     const [seats, setSeats] = useState<any[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+    const [hotel, setHotel] = useState<any>(null);
+    const [flight, setFlight] = useState<any>(null);
 
     const toggleSeat = (seatNum: number) => {
         setSelectedSeats(prev =>
@@ -30,6 +32,12 @@ export default function SingleTour() {
                     const seatsData = await seatsRes.json();
                     setSeats(seatsData);
                 }
+                const hotelRes = await fetch(`${API_URL}/tours/${id}/hotel`);
+                const hotelData = await hotelRes.json();
+                if (hotelData[0]) setHotel(hotelData[0]);
+                const flightRes = await fetch(`${API_URL}/flights/${id}`);
+                const flightData = await flightRes.json();
+                if (flightData[0]) setFlight(flightData[0]);
             } catch (err) {
                 console.error("Napaka pri nalaganju ture:", err);
             }
@@ -57,6 +65,21 @@ export default function SingleTour() {
             <p>{tour.description}</p>
             <p>Cena: {tour.price_per_person} €</p>
             <p>Prosta mesta: {tour.available_seats}</p>
+            {hotel && (
+                <div>
+                    <h3>Hotel</h3>
+                    <p>{hotel.name} — {hotel.stars}★</p>
+                    <p>Check-in: {hotel.check_in} | Check-out: {hotel.check_out}</p>
+                </div>
+            )}
+
+            {flight && (
+                <div>
+                    <h3>Let</h3>
+                    <p>{flight.airline} — {flight.flight_number}</p>
+                    <p>{flight.departure_airport} → {flight.arrival_airport}</p>
+                </div>
+            )}
             {tour.available_seats === 0 ? (
                 <button onClick={handleJoinWaitlist}>Pridruži se čakalni listi</button>
             ) : (
