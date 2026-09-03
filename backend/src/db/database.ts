@@ -162,7 +162,9 @@ export const createUser = async (
 };
 export const getAllTours = async (): Promise<Tour[]> => {
     const [rows] = await pool.query<Tour[]>(
-        "SELECT * FROM tour",
+        `SELECT t.*, g.first_name AS guide_first_name, g.last_name AS guide_last_name 
+         FROM tour t 
+         LEFT JOIN guide g ON t.guide_id = g.id`
     );
     return rows;
 }

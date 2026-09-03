@@ -8,6 +8,7 @@ import Reservation from "../pages/Reservation";
 import MyReservations from "../pages/MyReservations";
 import Waitlist from "../pages/Waitlist";
 import AdminPanel from "../pages/AdminPanel";
+import GuidePanel from "../pages/GuidePanel";
 
 export default function AppRouter() {
     return (
@@ -22,6 +23,7 @@ export default function AppRouter() {
                 <Route path="/my-reservations" element={<MyReservations />} />
                 <Route path="/waitlist" element={<Waitlist />} />
                 <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/guide" element={<GuidePanel />} />
             </Routes>
         </BrowserRouter>
     );

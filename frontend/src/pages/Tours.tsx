@@ -26,6 +26,7 @@ export default function Tours() {
                 {tours.map((tour: any) => (
                     <div key={tour.id}>
                         <h2><Link to={`/tours/${tour.id}`}>{tour.title}</Link></h2>
+                        <p>Vodnik: {tour.guide_first_name} {tour.guide_last_name}</p>
                         <p>{tour.description}</p>
                         <p>Cena: {tour.price_per_person} €</p>
                     </div>
