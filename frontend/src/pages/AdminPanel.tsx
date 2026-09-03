@@ -15,6 +15,10 @@ export default function AdminPanel() {
     const [destinations, setDestinations] = useState<any[]>([]);
     const [guides, setGuides] = useState<any[]>([]);
     const [message, setMessage] = useState("");
+    const [guideMessage, setGuideMessage] = useState("");
+    const [guideForm, setGuideForm] = useState({
+        first_name: "", last_name: "", bio: "", languages: "", photo: "", email: "", password: ""
+    });
 
     const [form, setForm] = useState({
         title: "", description: "", departure_date: "", return_date: "",
@@ -67,7 +71,6 @@ export default function AdminPanel() {
         });
 
         if (res.ok) {
-            const created = await res.json();
             setMessage("Tura uspešno ustvarjena!");
             setForm({
                 title: "", description: "", departure_date: "", return_date: "",
@@ -83,6 +86,23 @@ export default function AdminPanel() {
         }
     };
 
+    const handleCreateGuide = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const res = await fetch(`${API_URL}/guides`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(guideForm),
+        });
+        if (res.ok) {
+            setGuideMessage("Vodnik ustvarjen!");
+            setGuideForm({ first_name: "", last_name: "", bio: "", languages: "", photo: "", email: "", password: "" });
+            fetch(`${API_URL}/guides`).then(r => r.json()).then(setGuides);
+        } else {
+            const err = await res.json();
+            setGuideMessage("Napaka: " + err.error);
+        }
+    };
+
     const deleteTour = async (id: number) => {
         await fetch(`${API_URL}/tours/${id}`, { method: "DELETE" });
         setTours(prev => prev.filter(t => t.id !== id));
@@ -94,6 +114,19 @@ export default function AdminPanel() {
     return (
         <main>
             <h1>Admin Panel</h1>
+
+            <h2>Ustvari vodnika</h2>
+            <form onSubmit={handleCreateGuide}>
+                <input placeholder="Ime" value={guideForm.first_name} onChange={e => setGuideForm({ ...guideForm, first_name: e.target.value })} required /><br />
+                <input placeholder="Priimek" value={guideForm.last_name} onChange={e => setGuideForm({ ...guideForm, last_name: e.target.value })} required /><br />
+                <input placeholder="Email" value={guideForm.email} onChange={e => setGuideForm({ ...guideForm, email: e.target.value })} required /><br />
+                <input type="password" placeholder="Geslo" value={guideForm.password} onChange={e => setGuideForm({ ...guideForm, password: e.target.value })} required /><br />
+                <textarea placeholder="Bio" value={guideForm.bio} onChange={e => setGuideForm({ ...guideForm, bio: e.target.value })} /><br />
+                <input placeholder="Jeziki (npr. SL, EN, DE)" value={guideForm.languages} onChange={e => setGuideForm({ ...guideForm, languages: e.target.value })} /><br />
+                <input placeholder="URL fotografije" value={guideForm.photo} onChange={e => setGuideForm({ ...guideForm, photo: e.target.value })} /><br />
+                <button type="submit">Ustvari vodnika</button>
+            </form>
+            {guideMessage && <p>{guideMessage}</p>}
 
             <h2>Ustvari novo turo</h2>
             <form onSubmit={handleCreate}>

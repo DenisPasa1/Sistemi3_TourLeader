@@ -111,6 +111,7 @@ export interface Guide extends RowDataPacket {
     bio: string;
     languages: string;
     photo: string;
+    user_id: number
 }
 export interface Hotel extends RowDataPacket {
     id: number;
@@ -334,5 +335,38 @@ export const createHotel = async (
         [name, address, stars, check_in, check_out, tour_id]
     );
     return result;
+}
+export const createGuide = async (
+    first_name: string,
+    last_name: string,
+    bio: string,
+    languages: string,
+    photo: string
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO guide (first_name, last_name, bio, languages, photo) VALUES (?, ?, ?, ?, ?)",
+        [first_name, last_name, bio, languages, photo]
+    );
+    return result;
+}
+export const createGuideForUser = async (
+    first_name: string,
+    last_name: string,
+    bio: string,
+    languages: string,
+    photo: string,
+    user_id: number
+): Promise<ResultSetHeader> => {
+    const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO guide (first_name, last_name, bio, languages, photo, user_id) VALUES (?, ?, ?, ?, ?, ?)",
+        [first_name, last_name, bio, languages, photo, user_id]
+    );
+    return result;
+}
+export const getGuideByUserId = async (userId: number): Promise<Guide[]> => {
+    const [rows] = await pool.query<Guide[]>(
+        "SELECT * FROM guide WHERE user_id = ?", [userId]
+    );
+    return rows;
 }
 export default pool;
