@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://88.200.63.148:3001";
+const API_URL = "http://88.200.63.148:6767";
 
 export default function Register() {
     const navigate = useNavigate();
