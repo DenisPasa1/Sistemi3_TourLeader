@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
-const API_URL = "http://88.200.63.148:3001";
+const API_URL = "http://88.200.63.143:3001";
 
 export default function Tours() {
     const [tours, setTours] = useState([]);
@@ -22,16 +21,16 @@ export default function Tours() {
     return (
         <main>
             <h1>Seznam tur</h1>
-            <ul>
+            <div className="tour-grid">
                 {tours.map((tour: any) => (
                     <div key={tour.id}>
-                        <h2><Link to={`/tours/${tour.id}`}>{tour.title}</Link></h2>
+                        <h3><a href={`/tours/${tour.id}`}>{tour.title}</a></h3>
                         <p>Vodnik: {tour.guide_first_name} {tour.guide_last_name}</p>
                         <p>{tour.description}</p>
-                        <p>Cena: {tour.price_per_person} €</p>
+                        <p><strong>{tour.price_per_person} €</strong></p>
                     </div>
                 ))}
-            </ul>
+            </div>
         </main>
     );
 }

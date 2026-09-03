@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "http://88.200.63.143:3001";
 
 export default function Profile() {
     const navigate = useNavigate();

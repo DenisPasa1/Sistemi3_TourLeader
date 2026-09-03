@@ -1,5 +1,5 @@
 import { Router, Response, Request } from "express";
-import { getAllDestinations, getDestinationById } from "../db/database";
+import { getAllDestinations, getDestinationById, pool } from "../db/database";
 
 const router = Router();
 
@@ -23,6 +23,22 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
         res.json(destination[0]);
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+});
+router.post("/", async (req: Request, res: Response): Promise<void> => {
+    const { country, city, description } = req.body;
+    if (!country || !city) {
+        res.status(400).json({ error: "Država in mesto sta obvezna" });
+        return;
+    }
+    try {
+        const [result]: any = await pool.query(
+            "INSERT INTO destination (country, city, description) VALUES (?, ?, ?)",
+            [country, city, description || ""]
+        );
+        res.status(201).json({ message: "Destinacija dodana!", id: result.insertId });
+    } catch (err) {
         res.status(500).json({ error: "Napaka strežnika" });
     }
 });

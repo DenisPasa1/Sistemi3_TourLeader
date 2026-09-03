@@ -401,4 +401,12 @@ export const updateGuideProfile = async (
         [bio, languages, guideId]
     );
 }
+export const updateReservationStatus = async (id: number, status: string): Promise<void> => {
+    await pool.query("UPDATE reservation SET status = ? WHERE id = ?", [status, id]);
+}
+
+export const getReservationById = async (id: number): Promise<Reservation[]> => {
+    const [rows] = await pool.query<Reservation[]>("SELECT * FROM reservation WHERE id = ?", [id]);
+    return rows;
+}
 export default pool;

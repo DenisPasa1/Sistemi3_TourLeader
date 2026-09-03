@@ -64,6 +64,37 @@ router.get("/:id/passengers", async (req: Request, res: Response): Promise<void>
         res.status(500).json({ error: "Napaka strežnika" });
     }
 });
+
+router.put("/:id/accept", async (req: Request, res: Response): Promise<void> => {
+    try {
+        await pool.query("UPDATE reservation SET status = 'accepted' WHERE id = ?", [req.params.id]);
+        res.json({ message: "Rezervacija odobrena" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+});
+
+router.put("/:id/cancel", async (req: Request, res: Response): Promise<void> => {
+    try {
+        const [rows] = await pool.query<any[]>("SELECT * FROM reservation WHERE id = ?", [req.params.id]);
+        if (rows.length === 0) { res.status(404).json({ error: "Rezervacija ni najdena" }); return; }
+
+        const reservation = rows[0];
+        const [passengers] = await pool.query<any[]>("SELECT COUNT(*) as count FROM passenger WHERE reservation_id = ?", [req.params.id]);
+        const passengerCount = passengers[0].count;
+
+        await pool.query("DELETE FROM bus_seat WHERE reservation_id = ?", [req.params.id]);
+        await pool.query("UPDATE reservation SET status = 'cancelled' WHERE id = ?", [req.params.id]);
+        await updateAvailableSeats(reservation.tour_id, passengerCount);
+
+        res.json({ message: "Rezervacija preklicana" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+});
+
 router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
     try {
         const [rows] = await pool.query<any[]>("SELECT * FROM reservation WHERE id = ?", [req.params.id]);

@@ -14,6 +14,13 @@ export default function MyReservations() {
             .catch(err => console.error(err));
     }, []);
 
+    const handleCancel = async (id: number) => {
+        const res = await fetch(`${API_URL}/reservations/${id}/cancel`, { method: "PUT" });
+        if (res.ok) {
+            setReservations(prev => prev.map(r => r.id === id ? { ...r, status: "cancelled" } : r));
+        }
+    };
+
     if (!user) return <p>Najprej se prijavite.</p>;
 
     return (
@@ -28,6 +35,9 @@ export default function MyReservations() {
                         <p>Tura: {r.title || r.tour_id}</p>
                         <p>Status: {r.status}</p>
                         <p>Datum: {r.reserved_at}</p>
+                        {r.status !== "cancelled" && (
+                            <button onClick={() => handleCancel(r.id)}>Prekliči rezervacijo</button>
+                        )}
                     </div>
                 ))
             )}

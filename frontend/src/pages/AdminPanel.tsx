@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://88.200.63.148:3001";
+const API_URL = "http://localhost:3001";
 
 const emptyFlight = () => ({
     flight_number: "", airline: "", departure_airport: "",
@@ -16,10 +16,11 @@ export default function AdminPanel() {
     const [guides, setGuides] = useState<any[]>([]);
     const [message, setMessage] = useState("");
     const [guideMessage, setGuideMessage] = useState("");
+    const [destMessage, setDestMessage] = useState("");
+    const [destForm, setDestForm] = useState({ country: "", city: "", description: "" });
     const [guideForm, setGuideForm] = useState({
         first_name: "", last_name: "", bio: "", languages: "", photo: "", email: "", password: ""
     });
-
     const [form, setForm] = useState({
         title: "", description: "", departure_date: "", return_date: "",
         price_per_person: "", max_seats: "", category: "",
@@ -27,14 +28,12 @@ export default function AdminPanel() {
         license_plate: "",
         hotel_name: "", hotel_address: "", stars: "", check_in: "", check_out: "",
     });
-
     const [flights, setFlights] = useState([emptyFlight(), { ...emptyFlight(), direction: "return" }]);
 
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
     useEffect(() => {
         if (!user || user.role !== "admin") { navigate("/login"); return; }
-
         fetch(`${API_URL}/reservations`).then(r => r.json()).then(async (data) => {
             for (const r of data) {
                 const res = await fetch(`${API_URL}/reservations/${r.id}/passengers`);
@@ -42,7 +41,6 @@ export default function AdminPanel() {
             }
             setReservations(data);
         });
-
         fetch(`${API_URL}/tours`).then(r => r.json()).then(setTours);
         fetch(`${API_URL}/destinations`).then(r => r.json()).then(setDestinations);
         fetch(`${API_URL}/guides`).then(r => r.json()).then(setGuides);
@@ -50,6 +48,23 @@ export default function AdminPanel() {
 
     const setFlight = (i: number, field: string, value: string) => {
         setFlights(prev => prev.map((f, idx) => idx === i ? { ...f, [field]: value } : f));
+    };
+
+    const handleCreateDestination = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const res = await fetch(`${API_URL}/destinations`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(destForm),
+        });
+        if (res.ok) {
+            setDestMessage("Destinacija dodana!");
+            setDestForm({ country: "", city: "", description: "" });
+            fetch(`${API_URL}/destinations`).then(r => r.json()).then(setDestinations);
+        } else {
+            const err = await res.json();
+            setDestMessage("Napaka: " + err.error);
+        }
     };
 
     const handleCreate = async (e: React.FormEvent) => {
@@ -63,13 +78,11 @@ export default function AdminPanel() {
             stars: parseInt(form.stars),
             flights,
         };
-
         const res = await fetch(`${API_URL}/tours`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
-
         if (res.ok) {
             setMessage("Tura uspešno ustvarjena!");
             setForm({
@@ -115,6 +128,15 @@ export default function AdminPanel() {
         <main>
             <h1>Admin Panel</h1>
 
+            <h2>Dodaj destinacijo</h2>
+            <form onSubmit={handleCreateDestination}>
+                <input placeholder="Država" value={destForm.country} onChange={e => setDestForm({ ...destForm, country: e.target.value })} required /><br />
+                <input placeholder="Mesto" value={destForm.city} onChange={e => setDestForm({ ...destForm, city: e.target.value })} required /><br />
+                <textarea placeholder="Opis" value={destForm.description} onChange={e => setDestForm({ ...destForm, description: e.target.value })} /><br />
+                <button type="submit">Dodaj destinacijo</button>
+            </form>
+            {destMessage && <p>{destMessage}</p>}
+
             <h2>Ustvari vodnika</h2>
             <form onSubmit={handleCreateGuide}>
                 <input placeholder="Ime" value={guideForm.first_name} onChange={e => setGuideForm({ ...guideForm, first_name: e.target.value })} required /><br />
@@ -123,7 +145,6 @@ export default function AdminPanel() {
                 <input type="password" placeholder="Geslo" value={guideForm.password} onChange={e => setGuideForm({ ...guideForm, password: e.target.value })} required /><br />
                 <textarea placeholder="Bio" value={guideForm.bio} onChange={e => setGuideForm({ ...guideForm, bio: e.target.value })} /><br />
                 <input placeholder="Jeziki (npr. SL, EN, DE)" value={guideForm.languages} onChange={e => setGuideForm({ ...guideForm, languages: e.target.value })} /><br />
-                <input placeholder="URL fotografije" value={guideForm.photo} onChange={e => setGuideForm({ ...guideForm, photo: e.target.value })} /><br />
                 <button type="submit">Ustvari vodnika</button>
             </form>
             {guideMessage && <p>{guideMessage}</p>}
@@ -189,6 +210,12 @@ export default function AdminPanel() {
                     {r.passengers?.map((p: any) => (
                         <p key={p.id}>— {p.first_name} {p.last_name}, potni list: {p.passport_number}</p>
                     ))}
+                    {r.status === "pending" && (
+                        <button onClick={async () => {
+                            await fetch(`${API_URL}/reservations/${r.id}/accept`, { method: "PUT" });
+                            setReservations(prev => prev.map(x => x.id === r.id ? { ...x, status: "accepted" } : x));
+                        }}>Odobri</button>
+                    )}
                     <button onClick={async () => {
                         await fetch(`${API_URL}/reservations/${r.id}`, { method: "DELETE" });
                         setReservations(prev => prev.filter(x => x.id !== r.id));
