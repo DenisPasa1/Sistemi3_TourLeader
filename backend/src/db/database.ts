@@ -371,4 +371,34 @@ export const getGuideByUserId = async (userId: number): Promise<Guide[]> => {
     );
     return rows;
 }
+export const updateUserProfile = async (
+    userId: number,
+    first_name: string,
+    last_name: string,
+    phone: string
+): Promise<void> => {
+    await pool.query(
+        "UPDATE user SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?",
+        [first_name, last_name, phone, userId]
+    );
+}
+export const updateUserPassword = async (
+    userId: number,
+    password_hash: string
+): Promise<void> => {
+    await pool.query(
+        "UPDATE user SET password_hash = ? WHERE id = ?",
+        [password_hash, userId]
+    );
+}
+export const updateGuideProfile = async (
+    guideId: number,
+    bio: string,
+    languages: string
+): Promise<void> => {
+    await pool.query(
+        "UPDATE guide SET bio = ?, languages = ? WHERE id = ?",
+        [bio, languages, guideId]
+    );
+}
 export default pool;

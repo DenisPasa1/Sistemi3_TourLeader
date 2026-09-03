@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://88.200.63.148:3001";
 
@@ -6,6 +7,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -21,8 +23,8 @@ export default function Login() {
             const data = await res.json();
 
             if (res.ok) {
-                setMessage("Prijava uspešna!");
                 localStorage.setItem("user", JSON.stringify(data.user));
+                navigate("/");
             } else {
                 setMessage(data.error || "Napaka pri prijavi.");
             }

@@ -22,6 +22,7 @@ export default function Menu() {
             )}
             {user && user.role === "admin" && <Link to="/admin">Admin Panel</Link>}
             {user?.role === "guide" && <Link to="/guide">Moj panel</Link>}
+            {user && <Link to="/profile">Profile</Link>}
         </nav>
     );
 }

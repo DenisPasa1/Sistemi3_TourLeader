@@ -1,5 +1,5 @@
 import { Router, Response, Request } from "express";
-import { getAllGuides, getGuideById, createGuideForUser, getGuideByUserId, pool } from "../db/database";
+import { getAllGuides, getGuideById, createGuideForUser, getGuideByUserId, updateGuideProfile, pool } from "../db/database";
 import { createUser } from "../db/database";
 import bcrypt from "bcryptjs";
 
@@ -62,6 +62,15 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
         res.status(201).json({ message: "Vodnik ustvarjen!", id: guideResult.insertId });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: "Napaka strežnika" });
+    }
+});
+router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+    const { bio, languages } = req.body;
+    try {
+        await updateGuideProfile(Number(req.params.id), bio, languages);
+        res.json({ message: "Profil posodobljen" });
+    } catch (err) {
         res.status(500).json({ error: "Napaka strežnika" });
     }
 });

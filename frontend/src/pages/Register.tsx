@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = "http://88.200.63.148:3001";
 
 export default function Register() {
+    const navigate = useNavigate();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [phone, setPhone] = useState("");
@@ -25,6 +27,7 @@ export default function Register() {
 
             if (res.ok) {
                 setMessage("Registracija uspešna!");
+                navigate("/login");
             } else {
                 setMessage(data.error || "Napaka pri registraciji.");
             }

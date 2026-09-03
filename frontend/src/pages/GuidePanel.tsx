@@ -7,6 +7,8 @@ export default function GuidePanel() {
     const navigate = useNavigate();
     const [guide, setGuide] = useState<any>(null);
     const [tours, setTours] = useState<any[]>([]);
+    const [guideForm, setGuideForm] = useState({ bio: "", languages: "" });
+    const [guideMessage, setGuideMessage] = useState("");
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
     useEffect(() => {
@@ -16,6 +18,7 @@ export default function GuidePanel() {
             .then(r => r.json())
             .then(async (g) => {
                 setGuide(g);
+                setGuideForm({ bio: g.bio || "", languages: g.languages || "" });
                 const toursRes = await fetch(`${API_URL}/tours`);
                 const allTours = await toursRes.json();
                 const myTours = allTours.filter((t: any) => t.guide_id === g.id);
@@ -34,10 +37,29 @@ export default function GuidePanel() {
             });
     }, []);
 
+    const handleGuideUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const res = await fetch(`${API_URL}/guides/${guide.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(guideForm),
+        });
+        if (res.ok) setGuideMessage("Profil posodobljen!");
+        else setGuideMessage("Napaka.");
+    };
+
     return (
         <main>
             <h1>Guide Panel</h1>
             {guide && <p>Pozdravljeni, {guide.first_name} {guide.last_name}</p>}
+
+            <h2>Uredi profil</h2>
+            <form onSubmit={handleGuideUpdate}>
+                <textarea placeholder="Bio" value={guideForm.bio} onChange={e => setGuideForm({ ...guideForm, bio: e.target.value })} /><br />
+                <input placeholder="Jeziki" value={guideForm.languages} onChange={e => setGuideForm({ ...guideForm, languages: e.target.value })} /><br />
+                <button type="submit">Shrani</button>
+            </form>
+            {guideMessage && <p>{guideMessage}</p>}
 
             <h2>Moje ture</h2>
             {tours.length === 0 ? <p>Nimate dodeljenih tur.</p> : tours.map((t: any) => (
