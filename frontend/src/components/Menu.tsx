@@ -6,7 +6,7 @@ export default function Menu() {
     const handleLogout = () => { localStorage.removeItem("user"); navigate("/login"); };
     return (
         <nav>
-            <Link to="/">Tours</Link>
+            <Link to="/">Tour-Leader</Link>
             {user && (
                 <>
                     <span>Hello, {user.first_name}</span>
