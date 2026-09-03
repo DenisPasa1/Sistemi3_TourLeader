@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "http://88.200.63.148:3001";
 
 export default function Register() {
     const [firstName, setFirstName] = useState("");

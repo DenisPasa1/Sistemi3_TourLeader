@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:3001";
+const API_URL = "http://88.200.63.148:3001";
 
 export default function Reservation() {
     const { id } = useParams();
