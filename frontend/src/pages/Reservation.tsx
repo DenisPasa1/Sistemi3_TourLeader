@@ -10,7 +10,14 @@ export default function Reservation() {
     const selectedSeats: number[] = JSON.parse(localStorage.getItem("selectedSeats") || "[]");
     const busId = localStorage.getItem("busId");
     const [message, setMessage] = useState("");
-    const [passengers, setPassengers] = useState(
+    const [passengers, setPassengers] = useState<{
+        seat_number: number | null;
+        first_name: string;
+        last_name: string;
+        date_of_birth: string;
+        passport_number: string;
+        passport_expiry: string;
+    }[]>(
         selectedSeats.length > 0
             ? selectedSeats.map((seat) => ({
                 seat_number: seat,
